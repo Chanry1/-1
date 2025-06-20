@@ -1,10 +1,70 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-  <meta charset="UTF-8">
-  <title>企业官网首页</title>
+<meta charset="UTF-8" />
+<title>表情包制作工具 DEMO</title>
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<style>
+body{font-family:sans-serif;text-align:center;margin:0;padding:1rem;background:#f2f2f2;}
+canvas{border:1px solid #ccc;margin-top:10px;max-width:100%;}
+button,input{margin:0.5rem;}
+</style>
+<!-- ✨Fabric.js CDN，用于画布编辑 -->
+<script src="https://cdn.jsdelivr.net/npm/fabric@5.2.4/dist/fabric.min.js"></script>
 </head>
 <body>
-  <h1>欢迎来到企业官网</h1>
+<h2>表情包制作工具 DEMO</h2>
+
+<input type="file" id="upload" accept="image/*" />
+<button id="add-text">添加文字</button>
+<button id="download">导出 PNG</button>
+<br />
+<canvas id="c" width="500" height="500"></canvas>
+
+<script>
+/* 初始化画布 */
+const canvas = new fabric.Canvas('c');
+
+/* 1. 上传图片并自适应缩放 */
+document.getElementById('upload').addEventListener('change', (e) => {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = () => {
+    fabric.Image.fromURL(reader.result, (img) => {
+      const scale = Math.min(500 / img.width, 500 / img.height);
+      img.scale(scale);
+      canvas.clear();
+      canvas.add(img);
+      canvas.setActiveObject(img);
+    });
+  };
+  reader.readAsDataURL(file);
+});
+
+/* 2. 添加可编辑文字 */
+document.getElementById('add-text').addEventListener('click', () => {
+  const text = new fabric.Textbox('输入文字', {
+    left: 50,
+    top: 50,
+    fontSize: 32,
+    fill: '#fff',
+    stroke: '#000',
+    strokeWidth: 1,
+    editable: true,
+  });
+  canvas.add(text);
+  canvas.setActiveObject(text);
+});
+
+/* 3. 导出 PNG */
+document.getElementById('download').addEventListener('click', () => {
+  const dataURL = canvas.toDataURL({ format: 'png', quality: 1 });
+  const link = document.createElement('a');
+  link.href = dataURL;
+  link.download = 'meme.png';
+  link.click();
+});
+</script>
 </body>
 </html>
